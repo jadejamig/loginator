@@ -1,11 +1,14 @@
-import Image from "next/image";
-import Link from "next/link";
+import { LoginButton } from "@/components/auth/LoginButton";
+import { Button } from "@/components/ui/button";
 
 export default function Home() {
   return (
-    <div className="flex flex-col items-center">
-      <h1>Welcome to my application!</h1>
-      <Link href='/dashboard' className="text-blue-400">{`Continue ->`}</Link>
-    </div>
-  );
+    <main className="flex h-full flex-col items-center justify-center bg-blue-100">
+      <div>
+        <LoginButton>
+          <Button variant='secondary' size='lg'>Sign in</Button>
+        </LoginButton>
+      </div>
+    </main>
+  ) 
 }
