@@ -8,6 +8,8 @@ import { LoginSchema } from '@/schema'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '../ui/form'
 import { Input } from '../ui/input'
 import { Button } from '../ui/button'
+import { ErrorForm } from '../FormError'
+import { SuccessForm } from '../FormSuccess'
 
 const LoginForm = () => {
 
@@ -62,6 +64,8 @@ const LoginForm = () => {
                 )}
               />
             </div>
+            <SuccessForm message='Logged in Successfully!'/>
+            <ErrorForm message='Invalid Credentials'/>
             <Button type='submit' className='w-full'>Login</Button>
           </form>
         </Form>
