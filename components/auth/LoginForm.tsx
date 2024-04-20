@@ -10,6 +10,8 @@ import { Input } from '../ui/input'
 import { Button } from '../ui/button'
 import { ErrorForm } from '../FormError'
 import { SuccessForm } from '../FormSuccess'
+import { login } from '@/actions/login'
+import { useState, useTransition } from 'react'
 
 const LoginForm = () => {
 
@@ -21,8 +23,21 @@ const LoginForm = () => {
     }
   })
 
+  const [error, setError] = useState<string | undefined>("");
+  const [success, setSuccess] = useState<string | undefined>("");
+  const [isPending, startTransition] = useTransition();
+
   const onSubmit = (values: z.infer<typeof LoginSchema>) => {
-    console.log(values)
+    setError('');
+    setSuccess('');
+
+    startTransition(() => {
+      login(values)
+        .then((data) => {
+          setError(data.error);
+          setSuccess(data.success);
+        })
+    })
   }
 
   return (
@@ -44,7 +59,7 @@ const LoginForm = () => {
                   <FormItem>
                     <FormLabel>Email</FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder='john.doe@example.com' type='email'/>
+                      <Input disabled={isPending} {...field} placeholder='john.doe@example.com' type='email'/>
                     </FormControl>
                     <FormMessage/>
                   </FormItem>
@@ -57,16 +72,16 @@ const LoginForm = () => {
                   <FormItem>
                     <FormLabel>Password</FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder='******' type='password'/>
+                      <Input disabled={isPending} {...field} placeholder='******' type='password'/>
                     </FormControl>
                     <FormMessage/>
                   </FormItem>
                 )}
               />
             </div>
-            <SuccessForm message='Logged in Successfully!'/>
-            <ErrorForm message='Invalid Credentials'/>
-            <Button type='submit' className='w-full'>Login</Button>
+            <SuccessForm message={success}/>
+            <ErrorForm message={error}/>
+            <Button disabled={isPending} type='submit' className='w-full'>Login</Button>
           </form>
         </Form>
     </CardWrapper>
