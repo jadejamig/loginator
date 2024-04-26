@@ -18,14 +18,19 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
   adapter: PrismaAdapter(db),
   session: { strategy: "jwt" },
   callbacks: {
-    async signIn({ user }) {
-      if (!user.id)
-        return false
+    async signIn({ user, account }) {
+      
+      // google and github signin are automatically email verified
+      if (account?.provider !== "credentials") return true;
 
-      const existingUser = await getUserById(user.id)
-      // if (!existingUser || !existingUser.emailVerified)
-      //     return false
+      if (!user.id) return false;
 
+      const existingUser = await getUserById(user.id);
+
+      // Prevent signin unverified emails
+      if (!existingUser || !existingUser.emailVerified) return false
+
+      // TODO: Add 2FA check
       return true
     },
     async session({ token, session }) {

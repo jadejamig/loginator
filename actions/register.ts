@@ -1,10 +1,12 @@
 "use server"
 
-import { RegisterSchema } from "@/schema";
-import { z } from "zod";
-import bcrypt from "bcryptjs";
-import db from "@/lib/db";
 import { getUSerByEmail } from "@/data/user";
+import db from "@/lib/db";
+import { RegisterSchema } from "@/schema";
+import bcrypt from "bcryptjs";
+import { z } from "zod";
+import { generateVerificationToken } from "@/lib/tokens";
+import { sendVerificationEmail } from "@/lib/mail";
 
 
 export const register = async (values: z.infer<typeof RegisterSchema>) => {
@@ -23,9 +25,11 @@ export const register = async (values: z.infer<typeof RegisterSchema>) => {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    await db.user.create({ data: { email: email, password: hashedPassword, name: name }})
+    const createdUser = await db.user.create({ data: { email: email, password: hashedPassword, name: name }});
 
-    // TODO: Send verification token email
+    const verificationToken = await generateVerificationToken(createdUser.email);
 
-    return { success: "User created!" }
+    await sendVerificationEmail(verificationToken.email, verificationToken.token)
+
+    return { success: "Confimation email sent!" }
 }

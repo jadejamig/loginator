@@ -38,7 +38,7 @@ const LoginForm = () => {
       login(values)
         .then((data) => {
           setError(data?.error);
-          // RODO: Add success when 2FA is added
+          setSuccess(data?.success);
         })
     })
   }
