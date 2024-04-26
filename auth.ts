@@ -48,5 +48,21 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
 
       return token
     }
+  },
+  events: {
+    async linkAccount({ user }) {
+
+      if (!user.id)
+        return;
+
+      await db.user.update({
+        where: {id: user.id},
+        data: { emailVerified: new Date() }
+      })
+    }
+  },
+  pages: {
+    signIn: '/auth/login',
+    error: '/auth/error'
   }
 })

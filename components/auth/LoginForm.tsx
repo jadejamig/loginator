@@ -1,19 +1,22 @@
 'use client'
 
-import { CardWrapper } from './CardWrapper'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from "@hookform/resolvers/zod"
-import * as z from 'zod'
-import { LoginSchema } from '@/schema'
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '../ui/form'
-import { Input } from '../ui/input'
-import { Button } from '../ui/button'
-import { ErrorForm } from '../FormError'
-import { SuccessForm } from '../FormSuccess'
-import { login } from '@/actions/login'
-import { useState, useTransition } from 'react'
+import { CardWrapper } from './CardWrapper';
+import { useForm } from 'react-hook-form';
+import { useSearchParams } from 'next/navigation';
+import { useState, useTransition } from 'react';
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from 'zod';
+import { LoginSchema } from '@/schema';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '../ui/form';
+import { Input } from '../ui/input';
+import { Button } from '../ui/button';
+import { ErrorForm } from '../FormError';
+import { SuccessForm } from '../FormSuccess';
+import { login } from '@/actions/login';
 
 const LoginForm = () => {
+  const searchParams = useSearchParams();
+  const urlError = searchParams.get('error') === 'OAuthAccountNotLinked' ? 'Email already in use with different provider!' : "";
 
   const form = useForm<z.infer<typeof LoginSchema>>({
     resolver: zodResolver(LoginSchema),
@@ -21,7 +24,7 @@ const LoginForm = () => {
       email: "",
       password: ""
     }
-  })
+  });
 
   const [error, setError] = useState<string | undefined>("");
   const [success, setSuccess] = useState<string | undefined>("");
@@ -35,6 +38,7 @@ const LoginForm = () => {
       login(values)
         .then((data) => {
           setError(data?.error);
+          // RODO: Add success when 2FA is added
         })
     })
   }
@@ -79,7 +83,7 @@ const LoginForm = () => {
               />
             </div>
             <SuccessForm message={success}/>
-            <ErrorForm message={error}/>
+            <ErrorForm message={error || urlError}/>
             <Button disabled={isPending} type='submit' className='w-full'>Login</Button>
           </form>
         </Form>
