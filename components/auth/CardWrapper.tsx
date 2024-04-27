@@ -32,7 +32,6 @@ export const CardWrapper = ({ children, headerLabel, backButtonHref, backButtonL
                 href={backButtonHref}
                 label={backButtonLabel}
             >
-
             </BackButton>
         </CardFooter>
     </Card>
