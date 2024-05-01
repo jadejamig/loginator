@@ -8,8 +8,6 @@ interface LoginButtonProps {
     asChild?:  boolean
 }
 
-
-
 export function LoginButton({ children,  mode = "redirect", asChild} : LoginButtonProps) {
 
     const router = useRouter();
