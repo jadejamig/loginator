@@ -4,6 +4,8 @@ import { PrismaAdapter } from "@auth/prisma-adapter"
 import db from "./lib/db"
 import { getUserById } from "./data/user"
 import { UserRole } from "@prisma/client"
+import { getTwoFactorConfirmationByUserId } from "./data/two-factor-confirmation"
+import { use } from "react"
  
 declare module "next-auth" {
   interface Session {
@@ -19,7 +21,6 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
   session: { strategy: "jwt" },
   callbacks: {
     async signIn({ user, account }) {
-      
       // google and github signin are automatically email verified
       if (account?.provider !== "credentials") return true;
 
@@ -31,6 +32,17 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
       if (!existingUser || !existingUser.emailVerified) return false
 
       // TODO: Add 2FA check
+      if (existingUser.isTwoFactorEnabled) {
+        const twoFactorConfirmation = await getTwoFactorConfirmationByUserId(existingUser.id);
+
+        if (!twoFactorConfirmation) return false;
+        
+        // Delete 2FA Every login
+        // await db.twoFactorConfirmation.delete({
+        //   where: { id: twoFactorConfirmation.id }
+        // })
+      }
+
       return true
     },
     async session({ token, session }) {
@@ -55,10 +67,9 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
   },
   events: {
     async linkAccount({ user }) {
-
       if (!user.id)
         return;
-
+      
       await db.user.update({
         where: {id: user.id},
         data: { emailVerified: new Date() }

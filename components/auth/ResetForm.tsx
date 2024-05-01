@@ -27,7 +27,7 @@ const ResetForm = () => {
 
   const onSubmit = (values: z.infer<typeof ResetSchema>) => {
     setError('');
-    setSuccess('');
+    // setSuccess('');
 
     startTransition(() => {
       reset(values)
@@ -49,24 +49,26 @@ const ResetForm = () => {
           onSubmit={form.handleSubmit(onSubmit)}
           className='space-y-6'
         >
-          <div className='space-y-4'>
-            <FormField
-              control={form.control}
-              name='email'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Email</FormLabel>
-                  <FormControl>
-                    <Input disabled={isPending} {...field} placeholder='john.doe@example.com' type='email'/>
-                  </FormControl>
-                  <FormMessage/>
-                </FormItem>
-              )}
-            />
-          </div>
+          { !success && 
+            <div className='space-y-4'>
+              <FormField
+                control={form.control}
+                name='email'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email</FormLabel>
+                    <FormControl>
+                      <Input disabled={isPending} {...field} placeholder='john.doe@example.com' type='email'/>
+                    </FormControl>
+                    <FormMessage/>
+                  </FormItem>
+                )}
+              />
+            </div>
+          }
           <SuccessForm message={success}/>
           <ErrorForm message={error}/>
-          <Button disabled={isPending} type='submit' className='w-full'>Reset password</Button>
+          { !success && <Button disabled={isPending} type='submit' className='w-full'>Reset password</Button> }
         </form>
       </Form>
     </CardWrapper>

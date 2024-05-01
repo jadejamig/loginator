@@ -21,14 +21,20 @@ export const verification = async (token: string) => {
         return { error: "Token is invalid or already expired!" }
 
 
-    await db.user.update({
+    const updatedUser = await db.user.update({
         where: { id: existingUser.id },
         data: { emailVerified: new Date(), email: existingToken.email }
     })
 
-    await db.verificationToken.delete({
+    if (!updatedUser)
+        return { error: "A problem occured while the email!" }
+
+    const deletedToken = await db.verificationToken.delete({
         where: { id: existingToken.id }
     })
+
+    if (!deletedToken)
+        return { error: "An unexpected problem occured!" }
 
     return { success: "Email verified!"}
 }
